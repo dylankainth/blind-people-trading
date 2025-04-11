@@ -1,5 +1,13 @@
 "use client";
 export default function Trade() {
+
+
+
+
+
+
+
+
   const playTone = (frequency: number, duration: number = 500) => {
     const audioCtx = new (window.AudioContext || window.AudioContext)();
     const oscillator = audioCtx.createOscillator();
@@ -22,6 +30,10 @@ export default function Trade() {
         className="bg-blue-500 text-white px-4 py-2 rounded"
       >
         Play A4 (440 Hz)
+      </button>
+
+      <button>
+
       </button>
     </div>
   );
