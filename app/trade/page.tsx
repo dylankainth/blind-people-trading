@@ -6,7 +6,9 @@ export default function SolanaPrice() {
   const [price, setPrice] = useState<string | null>(null)
   const [status, setStatus] = useState("Click to start")
   const [isAudioReady, setIsAudioReady] = useState(false)
+  const [frequency, setFrequency] = useState(440)
 
+  const prevPriceRef = useRef<number | null>(null)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const oscillatorRef = useRef<OscillatorNode | null>(null)
   const gainNodeRef = useRef<GainNode | null>(null)
@@ -22,8 +24,7 @@ export default function SolanaPrice() {
 
       oscillator.connect(gainNode)
       gainNode.connect(audioCtx.destination)
-
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime) // Low volume
+      gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime)
 
       oscillator.start()
 
@@ -40,32 +41,45 @@ export default function SolanaPrice() {
     setStatus("Connecting...")
   }
 
-  const updateFrequency = (price: number) => {
-    if (!oscillatorRef.current || !audioCtxRef.current) return
+  const updateFrequencyFromDelta = (newPrice: number) => {
 
-    const freq = 200 + (price % 100) * 5 // Convert price to frequency
+    const prevPrice = prevPriceRef.current
+    if (!oscillatorRef.current || !audioCtxRef.current || prevPrice === null) return
+
+    const delta = newPrice - prevPrice
+
+    // Map price delta to pitch delta (e.g. $1 = 10Hz pitch change)
+    const pitchChange = delta * 150
+    const newFreq = oscillatorRef.current.frequency.value + pitchChange
+
+    // Clamp to sensible range
+    const clampedFreq = Math.max(100, Math.min(1200, newFreq))
+
     oscillatorRef.current.frequency.linearRampToValueAtTime(
-      freq,
-      audioCtxRef.current.currentTime + 0.2
+      clampedFreq,
+      audioCtxRef.current.currentTime + 0.1
     )
   }
 
   useEffect(() => {
     if (!isAudioReady) return
 
-    const socket = new WebSocket("wss://stream.binance.com:9443/ws/solusdt@trade")
+    const socket = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@trade")
 
-    socket.onopen = () => {
-      setStatus("Connected")
-    }
+    socket.onopen = () => setStatus("Connected")
 
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      if (data.p) {
-        const numericPrice = parseFloat(data.p)
-        setPrice(numericPrice.toFixed(2))
-        updateFrequency(numericPrice)
+      if (!data.p) return
+
+      const numericPrice = parseFloat(data.p)
+      setPrice(numericPrice.toFixed(2))
+
+      if (prevPriceRef.current !== null) {
+        updateFrequencyFromDelta(numericPrice)
       }
+
+      prevPriceRef.current = numericPrice
     }
 
     socket.onerror = (error) => {
@@ -73,9 +87,7 @@ export default function SolanaPrice() {
       setStatus("Error")
     }
 
-    socket.onclose = () => {
-      setStatus("Disconnected")
-    }
+    socket.onclose = () => setStatus("Disconnected")
 
     return () => socket.close()
   }, [isAudioReady])
