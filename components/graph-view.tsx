@@ -17,19 +17,25 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+
 const chartData = [
-    { month: "January", desktop: 186 },
-    { month: "February", desktop: 305 },
-    { month: "March", desktop: 237 },
-    { month: "April", desktop: 73 },
-    { month: "May", desktop: 209 },
-    { month: "June", desktop: 214 },
+    { month: "January", historical: 186 },
+    { month: "February", historical: 305 },
+    { month: "March", historical: 237 },
+    { month: "April", historical: 73, predicted: 73 },
+    { month: "May", predicted: 209 },
+    { month: "June", predicted: 214 },
 ]
 
 const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "hsl(var(--chart-1))",
+    historical: {
+        label: "Historical",
+        color: "hsl(var(--sky-600))",
+        icon: Activity,
+    },
+    predicted: {
+        label: "Predicted",
+        color: "hsl(var(--amber-400))",
         icon: Activity,
     },
 } satisfies ChartConfig
@@ -64,9 +70,16 @@ const GraphView: React.FC = () => {
                             content={<ChartTooltipContent hideLabel />}
                         />
                         <Line
-                            dataKey="desktop"
+                            dataKey="historical"
                             type="linear"
-                            stroke="#000"
+                            stroke="#0ea5e9"
+                            strokeWidth={2}
+                            dot={false}
+                        />
+                        <Line
+                            dataKey="predicted"
+                            type="linear"
+                            stroke="#fbbf24"
                             strokeWidth={2}
                             dot={false}
                         />
@@ -86,5 +99,3 @@ const GraphView: React.FC = () => {
 }
 
 export default GraphView
-
-
