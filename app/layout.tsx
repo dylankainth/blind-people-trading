@@ -15,7 +15,7 @@ export default function RootLayout({
             <body>
                 <Providers>
                     <Navbar />
-                    <main className="flex flex-col min-h-screen mx-20 pt-10">
+                    <main className="flex flex-col min-h-screen mx-20 py-10">
                         {children}
                     </main>
                 </Providers>
