@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
       }`}
     >
       <Link href="/">
-        <div className="flex items-center gap-2 text-lg font-bold">
+        <div className="flex items-center gap-2 text-lg font-bold hover:scale-110 transition-transform duration-300 ">
           <img
             src={
               theme === "dark" ? "/trading-icon-white.svg" : "/trading-icon.svg"
@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
             <img
               src="/solana.png"
               alt="Solana Logo"
-              className="h-10 w-10"
+              className="h-10 w-10 hover:scale-110 transition-transform duration-300 "
             ></img>
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-4">

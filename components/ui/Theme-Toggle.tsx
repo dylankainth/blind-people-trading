@@ -22,7 +22,7 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(currentTheme === 'light' ? 'dark' : 'light')}
-      className={`p-2 rounded-full transition-colors ${currentTheme === 'dark' ? 'bg-gray-700 text-white' : 'bg-[#f2e2ba] text-black'}`}
+      className={`p-2 rounded-full transition-colors hover:scale-110 transition-transform duration-300  ${currentTheme === 'dark' ? 'bg-gray-700 text-white' : 'bg-[#f2e2ba] text-black'}`}
       aria-label="Toggle theme"
     >
       {currentTheme === 'light' ? '🌙' : '🌞'}

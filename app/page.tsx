@@ -46,7 +46,7 @@ export default function Home() {
             className={`rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-[1.05] ${
               theme === "dark"
                 ? "bg-[#1a202c] border border-gray-700"
-                : "text-[#90cdf4]"
+                : "text-[#90cdf4] bg-[#fbfbfb]"
             }`}
           >
             <div className="p-8 text-center">
@@ -82,7 +82,7 @@ export default function Home() {
             className={`rounded-2xl overflow-hidden shadow-md transition-all duration-300 transform hover:scale-[1.05] ${
               theme === "dark"
                 ? "bg-[#1a202c] border-gray-700"
-                : "bg-white hover:shadow-xl"
+                : "bg-[#fbfbfb] hover:shadow-xl"
             }`}
           >
             <div className="p-8 text-center">
