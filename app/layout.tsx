@@ -1,31 +1,37 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from './providers';
-import '@rainbow-me/rainbowkit/styles.css';
+import { Providers } from "./providers";
+import "@rainbow-me/rainbowkit/styles.css";
 import { useAccount } from "wagmi";
 import Navbar from "@/components/navbar";
-import LoginScreen from "@/components/login-screen";
+import { ThemeProvider } from "next-themes";
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-
-
     return (
         <html lang="en">
-            <body>
-                <Providers>
-                    <div>
-                        <Navbar />
-                        <main className="flex flex-col min-h-screen mx-20 py-10">
-                            {children}
-                        </main>
-                    </div>
-                </Providers>
-            </body>
+          <head>
+            {/* You can include the metadata here if needed */}
+          </head>
+          <body>
+            {/* Providers to wrap around app context */}
+            <Providers>
+              {/* Theme provider for controlling light/dark mode */}
+              <ThemeProvider attribute="class" defaultTheme="light">
+                <div className="min-h-screen flex flex-col">
+                  {/* Navbar */}
+                  <Navbar />
+      
+                  {/* Main content area */}
+                  <main className="flex-1 mx-20 py-10 mt-10">{children}</main>
+                </div>
+              </ThemeProvider>
+            </Providers>
+          </body>
         </html>
-    );
+      );
 }

@@ -40,6 +40,36 @@
     --radius-lg: var(--radius);
     --radius-xl: calc(var(--radius) + 4px);
 }
+html {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+  
+  html.dark {
+    --background: #000000;
+    --foreground: #ffffff;
+  }
+  
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  
+  .min-h-screen {
+      background-color: var(--background);
+      color: var(--foreground);
+  }
+  
+  main {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  
+  .Navbar {
+    background-color: var(--background); 
+    color: var(--foreground);
+}
+  
 
 :root {
     --radius: 0.625rem;
