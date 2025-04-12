@@ -1,6 +1,7 @@
 import React from "react";
 import { NavigationMenu, NavigationMenuList, NavigationMenuLink, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import Link from "next/link";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const Navbar: React.FC = () => {
     return (
@@ -12,6 +13,10 @@ const Navbar: React.FC = () => {
                         <Link href="/docs" className={navigationMenuTriggerStyle()}>
                             klnreslkrnesjirs
                         </Link>
+                    </NavigationMenuLink>
+
+                    <NavigationMenuLink>
+                        <ConnectButton />
                     </NavigationMenuLink>
                 </NavigationMenuList>
             </NavigationMenu>
