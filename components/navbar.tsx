@@ -15,14 +15,14 @@ const Navbar: React.FC = () => {
   const { theme } = useTheme(); // Hook to get and set the theme
   return (
     <nav
-      className={`flex items-center justify-between p-4 ${
+      className={`relative z-10 bg-background text-foreground flex items-center justify-between p-4 ${
         theme === "dark"
           ? "shadow-[0px_4px_10px_rgba(255,255,255,0.1)] bg-gradient-to-r from-[#14F195] to-[#6345EB]" // Dark mode with Solana gradient
           : "shadow-lg bg-gradient-to-r from-[#14F195] to-[#6345EB]" // Light mode with Solana gradient
       }`}
     >
       <Link href="/">
-        <div className="flex items-center gap-2 text-lg font-bold hover:scale-110 transition-transform duration-300 ">
+        <div className="flex items-center gap-2 text-lg font-bold hover:scale-107 transition-transform duration-300 ">
           <img
             src={
               "/trading-icon.svg"
