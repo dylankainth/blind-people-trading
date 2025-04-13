@@ -181,17 +181,17 @@ const GraphView: React.FC = ({ data: initialData }: ZoomableChartProps) => {
         <Card className="w-full h-full">
             <CardHeader className="flex-col items-stretch space-y-0 border-b p-0 sm:flex-row hidden sm:flex">
                 <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-                    <CardTitle>Zoomable Chart Demo</CardTitle>
+                    <CardTitle>Solana Price</CardTitle>
                 </div>
                 <div className="flex">
                     <div
                         className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l bg-muted/10 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
                     >
                         <span className="text-xs text-muted-foreground">
-                            Events
+                            Closing Price
                         </span>
                         <span className="text-lg font-bold leading-none sm:text-3xl">
-                            {total.toLocaleString()}
+                            {'$' + (zoomedData[zoomedData.length - 1]?.Close || 0).toFixed(2)}
                         </span>
                     </div>
                 </div>
@@ -248,7 +248,7 @@ const GraphView: React.FC = ({ data: initialData }: ZoomableChartProps) => {
                                     content={
                                         <ChartTooltipContent
                                             className="w-[150px] sm:w-[200px] font-mono text-xs sm:text-sm"
-                                            nameKey="events"
+                                            nameKey="closed"
                                             labelFormatter={(value) => new Date(value).toLocaleString()}
                                         />
                                     }
@@ -256,7 +256,7 @@ const GraphView: React.FC = ({ data: initialData }: ZoomableChartProps) => {
                                 <ChartLegend content={<ChartLegendContent />} />
                                 <Area
                                     type="monotone"
-                                    dataKey="events"
+                                    dataKey="Close"
                                     stroke={chartConfig.events.color}
                                     fillOpacity={1}
                                     fill="url(#colorEvents)"
