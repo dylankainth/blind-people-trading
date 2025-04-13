@@ -176,8 +176,8 @@ $$ \text{Value\_Adjusted} = \text{Value\_Pred} \cdot \left(0.8 + 0.2 \cdot \tanh
 **3.1 Directional Loss**  
 *Purpose: Joint optimization*  
 $$ L = 0.6 \cdot \text{HuberLoss} + 0.4 \cdot \text{DirectionLoss} $$  
-- 60% weight on value accuracy ($$w_v=0.6$$)
-- 40% weight on direction correctness ($$w_d=0.4$$)
+- 60% weight on value accuracy ($w_v=0.6$)
+- 40% weight on direction correctness ($w_d=0.4$)
 - Balances regression and classification objectives
 
 **3.2 Huber Loss**  
