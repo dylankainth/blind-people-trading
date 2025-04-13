@@ -91,15 +91,15 @@ def preprocess_new_data(raw_df, differenced, all_features, T):
     return df[all_features]
 
 # Load artifacts
-config = joblib.load('config.pkl')
-feature_scaler = joblib.load('feature_scaler.pkl') 
-target_scaler = joblib.load('target_scaler.pkl')
+config = joblib.load('quant_prediction/config.pkl')
+feature_scaler = joblib.load('quant_prediction/feature_scaler.pkl') 
+target_scaler = joblib.load('quant_prediction/target_scaler.pkl')
 
 # Load models with EXACT feature dimensions
 models = []
 for i in range(3):
     model = SolanaPredictor(input_size=len(config['all_features']))
-    model.load_state_dict(torch.load(f'best_model_{i}.pth'))
+    model.load_state_dict(torch.load(f'quant_prediction/best_model_{i}.pth'))
     model.eval()
     models.append(model)
 ensemble = EnsemblePredictor(models)
