@@ -152,5 +152,8 @@ def run():
     current_price = np.exp(df_scaled['Original_Log_Close'].iloc[-1])
     pre_direction = "UP" if pred_price > current_price else "DOWN"
 
-    print(f"Predicted next hour price: ${pred_price:.2f}")
-    print(f"prediction direction: {pre_direction}")
+    return {
+        'pred_price': pred_price,
+        'current_price': current_price,
+        'pre_direction': pre_direction
+    }

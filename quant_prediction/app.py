@@ -867,7 +867,7 @@ async def start_chat_endpoint():
 
 @app.get("/predictdata")
 def predictData():
-    run()
+    return run()
 
 
 # --- Run FastAPI Server ---
