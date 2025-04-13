@@ -75,7 +75,9 @@ The `SolanaPredictor` model includes:
 - **CNN**: Extracts features from the input sequence.
 - **LSTM Heads**: Separate LSTMs for value and direction predictions.
 - **Self-Attention**: Weighs time steps using:
-$$ \text{attn\_weights} = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) $$
+```math
+\text{attn\_weights} = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right)
+```
 - **Time-based Attention**: Uses positional encoding to emphasize recent data.
 
 ## Loss Function
@@ -86,7 +88,9 @@ The `DirectionalLoss` combines:
 - **Direction Loss**: Penalizes incorrect direction predictions with class weights.
 
 Total loss:
-$$ \text{loss} = w_v \cdot \text{HuberLoss}(\text{pred}, \text{target}) + w_d \cdot \text{direction\_loss} $$
+```math
+\text{loss} = w_v \cdot \text{HuberLoss}(\text{pred}, \text{target}) + w_d \cdot \text{direction\_loss}
+```
 
 ## Ensemble Method
 
@@ -108,7 +112,9 @@ The ensemble model predicts the next hour's price, and the direction is determin
 
 **1.1 Log Transformation**  
 *Purpose: Stabilize variance in price series*  
-$$ \text{Log\_Close} = \ln(\text{Close}) $$  
+```math
+\text{Log\_Close} = \ln(\text{Close})
+```
 Applies natural logarithm to closing prices to:
 - Reduce sensitivity to extreme values
 - Convert multiplicative relationships to additive
@@ -116,7 +122,9 @@ Applies natural logarithm to closing prices to:
 
 **1.2 Differencing**  
 *Purpose: Achieve stationarity*  
-$$ \text{Close}_t = \text{Log\_Close}_t - \text{Log\_Close}_{t-1} $$  
+```math
+\text{Close}_t = \text{Log\_Close}_t - \text{Log\_Close}_{t-1}
+```
 If Augmented Dickey-Fuller test shows non-stationarity (p-value > 0.05), this transformation:
 - Removes trend components
 - Makes statistical properties constant over time
@@ -124,14 +132,18 @@ If Augmented Dickey-Fuller test shows non-stationarity (p-value > 0.05), this tr
 
 **1.3 Technical Indicators (RSI Example)**  
 *Purpose: Capture momentum*  
-$$ \text{RSI} = 100 - \frac{100}{1 + \frac{\text{Avg Gain}_{14}}{\text{Avg Loss}_{14}}} $$  
+```math
+\text{RSI} = 100 - \frac{100}{1 + \frac{\text{Avg Gain}_{14}}{\text{Avg Loss}_{14}}}
+```
 - Computes relative strength over 14-period window
 - Values > 70 indicate overbought, < 30 oversold
 - Avg Gain/Loss are exponential moving averages
 
 **1.4 Price Momentum**  
 *Purpose: Identify trend direction*  
-$$ \text{Price\_Momentum}_n = \text{Close}_t - \text{Close}_{t-n} $$  
+```math
+\text{Price\_Momentum}_n = \text{Close}_t - \text{Close}_{t-n}
+```
 - Calculates n-period price change (typically n=4 for 4-hour momentum)
 - Positive values indicate upward trend
 - Helps model recognize acceleration/deceleration
@@ -156,7 +168,9 @@ $$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$
 
 **2.3 Time-Based Attention**  
 *Purpose: Prioritize recent patterns*  
-$$ \text{Weighted Input} = x \cdot \text{softmax}(\text{time\_weights}) $$  
+```math
+\left( \sum_{k=1}^{n} a_k b_k \right)^2 \leq \left( \sum_{k=1}^{n} a_k^{2} \right)\left( \sum_{k=1}^{n} b_k^{2} \right)
+```
 - Learnable time weights ($$time\_weights$$) adaptively emphasize recent data
 - Combined with positional encoding for temporal context
 
