@@ -154,7 +154,9 @@ If Augmented Dickey-Fuller test shows non-stationarity (p-value > 0.05), this tr
 
 **2.1 LSTM Hidden State Update**  
 *Purpose: Maintain temporal memory*  
-$$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$  
+```math
+h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1})
+```
 - $h_t \in \mathbb{R}^d$: Hidden state vector at time $$t$$
 - $c_t \in \mathbb{R}^d$: Cell state vector carrying long-term information  
 - $d$: Hidden dimension size
