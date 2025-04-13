@@ -8,9 +8,8 @@ import numpy as np
 import math
 from statsmodels.tsa.stattools import adfuller
 
-def run():
-    # loss function
-    class DirectionalLoss(nn.Module):
+# loss function
+class DirectionalLoss(nn.Module):
         def __init__(self, value_weight=0.7, direction_weight=0.3, class_weights=None):
             super().__init__()
             self.value_loss = nn.HuberLoss()
@@ -42,7 +41,7 @@ def run():
             return self.value_weight * value_loss + self.direction_weight * direction_loss
 
     ### Dataset Class
-    class TimeSeriesDataset(Dataset):
+class TimeSeriesDataset(Dataset):
         def __init__(self, df_scaled, T, start_idx, end_idx, features, target='Close'):
             self.df_scaled = df_scaled
             self.T = T
@@ -61,7 +60,7 @@ def run():
             return torch.FloatTensor(seq), torch.FloatTensor([target])
 
     ### Self-Attention Layer
-    class SelfAttention(nn.Module):
+class SelfAttention(nn.Module):
         def __init__(self, hidden_size):
             super().__init__()
             self.query = nn.Linear(hidden_size, hidden_size)
@@ -77,7 +76,7 @@ def run():
             return attn_weights @ v
 
     ### Enhanced CNN-LSTM Model - Updated to match CryptoDirectionPredictor architecture
-    class SolanaPredictor(nn.Module):
+class SolanaPredictor(nn.Module):
         def __init__(self, input_size, cnn_channels=64, lstm_hidden_size=128):
             super().__init__()
             self.cnn = nn.Sequential(
@@ -143,7 +142,7 @@ def run():
             
             return value_adjusted
 
-    class EnsemblePredictor:
+class EnsemblePredictor:
         def __init__(self, models, weights=None):
             self.models = models
             self.weights = weights if weights is not None else [1/len(models)] * len(models)
@@ -163,7 +162,7 @@ def run():
                 
             return ensemble_pred
 
-    def analyze_target_distribution(df, target_col='Close'):
+def analyze_target_distribution(df, target_col='Close'):
         """Analyze and visualize the target distribution to identify class imbalance."""
         directions = np.sign(df[target_col].diff())
         up_count = np.sum(directions > 0)
@@ -179,7 +178,7 @@ def run():
         
         return weights
 
-    def clean_extreme_values(df, columns, threshold=10):
+def clean_extreme_values(df, columns, threshold=10):
         """Replace extreme values with reasonable limits to prevent training issues."""
         for col in columns:
             if col in df.columns:
@@ -198,7 +197,7 @@ def run():
         return df
 
     ### Data Preprocessing and Feature Engineering
-    def add_directional_features(df):
+def add_directional_features(df):
         """Add features specifically designed for direction prediction."""
         # Price momentum features
         df['Price_Momentum_5'] = df['Close'].diff(5)
@@ -234,7 +233,7 @@ def run():
         
         return df
 
-    def load_and_preprocess_data(ticker, period, interval, T, train_ratio, val_ratio):
+def load_and_preprocess_data(ticker, period, interval, T, train_ratio, val_ratio):
         df = yf.Ticker(ticker).history(period=period, interval=interval).reset_index()
         # Clean extreme values before any transformations
         df = clean_extreme_values(df, ['Volume', 'Open', 'High', 'Low', 'Close'], threshold=5)
@@ -318,7 +317,7 @@ def run():
         return df_scaled, feature_scaler, target_scaler, split_indices, all_features, differenced
 
     ### Helper Functions
-    def create_datasets_and_loaders(df_scaled, T, split_indices, features, batch_size):
+def create_datasets_and_loaders(df_scaled, T, split_indices, features, batch_size):
         train_dataset = TimeSeriesDataset(df_scaled, T, *split_indices['train'], features)
         val_dataset = TimeSeriesDataset(df_scaled, T, *split_indices['val'], features)
         test_dataset = TimeSeriesDataset(df_scaled, T, *split_indices['test'], features)
@@ -327,7 +326,7 @@ def run():
         test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
         return train_loader, val_loader, test_loader
 
-    def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs, target_scaler, scheduler=None, patience=5):
+def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs, target_scaler, scheduler=None, patience=5):
         best_dir_acc = 0.0
         patience_counter = 0
         
@@ -383,7 +382,7 @@ def run():
         # Load best model
         model.load_state_dict(torch.load('best_model.pth'))
 
-    def predict_next_hour_ensemble(ensemble, df_scaled, T, features, target_scaler, differenced):
+def predict_next_hour_ensemble(ensemble, df_scaled, T, features, target_scaler, differenced):
         with torch.no_grad():
             last_seq = torch.FloatTensor(df_scaled.iloc[-T:][features].values).unsqueeze(0)
             pred_scaled = ensemble.predict(last_seq).item()
@@ -395,69 +394,3 @@ def run():
             else:
                 pred_price = np.exp(pred_diff_or_log)
         return pred_price
-
-    ### Main Execution
-        # Configuration
-    ticker = 'SOL-USD'
-    period = "730d"
-    interval = '1h'
-    T = 24  # Look-back window
-    train_ratio = 0.7
-    val_ratio = 0.15
-    num_epochs = 15
-    batch_size = 32
-    learning_rate = 0.0005
-        
-        # 6. Fix Data Leakage Concerns & 7. Anomaly Fixes for Extreme Values
-        # These are addressed in load_and_preprocess_data() which includes clean_extreme_values()
-    df_scaled, feature_scaler, target_scaler, split_indices, features, differenced = load_and_preprocess_data(
-            ticker, period, interval, T, train_ratio, val_ratio
-        )
-        
-        # 1. Address Class Imbalance - Analyze target distribution to calculate class weights
-    class_weights = analyze_target_distribution(df_scaled, 'Close')
-        
-        # Create dataset and loaders
-    train_loader, val_loader, test_loader = create_datasets_and_loaders(
-            df_scaled, T, split_indices, features, batch_size
-        )
-        
-        # 5. Cross-Timeframe Analysis
-        # Additional timeframes for ensemble model
-    timeframes = [
-            {'period': "730d", 'interval': '1h'},
-            {'period': "365d", 'interval': '1h'},
-            {'period': "180d", 'interval': '1h'}
-        ]
-        
-        # 4. Ensemble Approach for Better Stability
-    models = []
-    for i in range(3):  # Create 3 models with different seeds
-            torch.manual_seed(42 + i)  # Different seed for initialization
-            
-            # 3. Model Architecture with Attention to Recent Data
-            # SolanaPredictor already includes self-attention mechanisms
-            model = SolanaPredictor(input_size=len(features))
-            
-            # Define loss with directional component
-            criterion = DirectionalLoss(value_weight=0.6, direction_weight=0.4, class_weights=class_weights)
-            
-            # 8. Learning Rate Schedule
-            optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
-            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode='max', factor=0.5, patience=3
-        )
-            
-            # Train with scheduler for learning rate adjustment
-            train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs, 
-                    target_scaler, scheduler=scheduler, patience=5)
-            
-            models.append(model)
-        
-        # Create ensemble predictor with equal weights
-    ensemble = EnsemblePredictor(models)
-
-    ensemble_pred = predict_next_hour_ensemble(ensemble, df_scaled, T, features, target_scaler, differenced)
-    current_price = np.exp(df_scaled['Original_Log_Close'].iloc[-1])  # Use original log price
-    ensemble_direction = "UP" if ensemble_pred > current_price else "DOWN"
-    return ensemble_pred, ensemble_direction
