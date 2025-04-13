@@ -176,7 +176,9 @@ $$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$
 
 **2.4 Value Adjustment**  
 *Purpose: Couple price/direction predictions*  
-$$ \text{Value\_Adjusted} = \text{Value\_Pred} \cdot \left(0.8 + 0.2 \cdot \tanh(\text{Dir\_Logit})\right) $$  
+```math
+\text{Value\_Adjusted} = \text{Value\_Pred} \cdot \left(0.8 + 0.2 \cdot \tanh(\text{Dir\_Logit})\right)
+```
 - $\tanh$ bounds adjustment between [-0.2, +0.2]
 - 0.8 base weight maintains stability
 - Direction logit ($Dir\_Logit$) from classification head
@@ -187,20 +189,22 @@ $$ \text{Value\_Adjusted} = \text{Value\_Pred} \cdot \left(0.8 + 0.2 \cdot \tanh
 
 **3.1 Directional Loss**  
 *Purpose: Joint optimization*  
-$$ L = 0.6 \cdot \text{HuberLoss} + 0.4 \cdot \text{DirectionLoss} $$  
+```math
+L = 0.6 \cdot \text{HuberLoss} + 0.4 \cdot \text{DirectionLoss}
+```
 - 60% weight on value accuracy ($w_v=0.6$)
 - 40% weight on direction correctness ($w_d=0.4$)
 - Balances regression and classification objectives
 
 **3.2 Huber Loss**  
 *Purpose: Robust regression*  
-$$
+```math
 \text{HuberLoss} = 
 \begin{cases} 
-\frac{1}{2}(\hat{y} - y)^2 & \text{if } |\hat{y} - y| \leq \delta \\
-\delta|\hat{y} - y| - \frac{1}{2}\delta^2 & \text{otherwise}
+  \frac{1}{2}(\hat{y} - y)^2 & \text{if } |\hat{y} - y| \leq \delta \\
+  \delta|\hat{y} - y| - \frac{1}{2}\delta^2 & \text{otherwise}
 \end{cases}
-$$
+```
   
 - $\delta=1.0$: Threshold for linear/quadratic behavior
 - Less sensitive to outliers than MSE
@@ -208,7 +212,9 @@ $$
 
 **3.3 Direction Loss**  
 *Purpose: Handle class imbalance*  
-$$ \text{DirectionLoss} = \frac{\sum w_i \cdot \mathbf{1}(\text{sign}(\hat{y}_i) \neq \text{sign}(y_i))}{\sum \mathbf{1}(|y_i| > \epsilon)} $$  
+```math
+\text{DirectionLoss} = \frac{\sum w_i \cdot \mathbf{1}(\text{sign}(\hat{y}_i) \neq \text{sign}(y_i))}{\sum \mathbf{1}(|y_i| > \epsilon)}
+```
 - $w_i$: Instance weight (higher for large price moves)
 - $\epsilon=0.005$: Filter for significant movements
 - Focuses model on meaningful directional changes
@@ -219,14 +225,18 @@ $$ \text{DirectionLoss} = \frac{\sum w_i \cdot \mathbf{1}(\text{sign}(\hat{y}_i)
 
 **4.1 Model Combination**  
 *Purpose: Improve stability*  
-$$ \hat{y}_{\text{ensemble}} = \frac{1}{3}\sum_{i=1}^3 \hat{y}_i $$  
+```math
+\hat{y}_{\text{ensemble}} = \frac{1}{3}\sum_{i=1}^3 \hat{y}_i
+```
 - Simple average of 3 independently trained models
 - Reduces variance through diversification
 - Each model uses different random initialization
 
 **4.2 Price Reconstruction**  
 *Purpose: Convert predictions to USD*  
-$$ \text{Pred\_Price} = \exp(\text{Last\_Log\_Close} + \text{Pred\_Diff}) $$  
+```math
+\text{Pred\_Price} = \exp(\text{Last\_Log\_Close} + \text{Pred\_Diff})
+```
 1. If differenced: Reconstruct log price by adding prediction to last observed value
 2. Exponentiate to reverse log transformation
 3. Convert stationary value back to USD price
@@ -246,13 +256,13 @@ $$ \text{Pred\_Price} = \exp(\text{Last\_Log\_Close} + \text{Pred\_Diff}) $$
 
 **5.2 Directional Prediction**  
 *Decision Rule*:
-$$
+```math
 \text{Direction} = 
 \begin{cases}
-\text{"UP"} & \text{if } \hat{y}_{\text{ensemble}} > \text{Current\_Price} \\
-\text{"DOWN"} & \text{otherwise}
+  \text{"UP"} & \text{if } \hat{y}_{\text{ensemble}} > \text{Current\_Price} \\
+  \text{"DOWN"} & \text{otherwise}
 \end{cases}
-$$
+```
   
 - Compares prediction to most recent observed price
 - Threshold-free decision for operational simplicity
