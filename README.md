@@ -149,13 +149,10 @@ $$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$
 - Update gate controls information retention:
 
 **2.2 Self-Attention Mechanism**  
-*Purpose: Focus on relevant time steps*  
-$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$  
-- $Q$: Query matrix (current focus)
-- $K$: Key matrix (memory keys)
-- $V$: Value matrix (actual content)
-- $\sqrt{d_k}$: Scaling factor preventing gradient vanishing
-
+*Purpose: Focus on relevant time steps*
+```math
+\left( \sum_{k=1}^{n} a_k b_k \right)^2 \leq \left( \sum_{k=1}^{n} a_k^{2} \right) \left( \sum_{k=1}^{n} b_k^{2} \right)
+```
 **2.3 Time-Based Attention**  
 *Purpose: Prioritize recent patterns*  
 $$ \text{Weighted Input} = x \cdot \text{softmax}(\text{time\_weights}) $$  
