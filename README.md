@@ -150,7 +150,7 @@ $$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$
 
 **2.2 Self-Attention Mechanism**  
 *Purpose: Focus on relevant time steps*  
-$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$  
+$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $  
 - $Q$: Query matrix (current focus)
 - $K$: Key matrix (memory keys)
 - $V$: Value matrix (actual content)
