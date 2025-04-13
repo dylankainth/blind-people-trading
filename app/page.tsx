@@ -22,11 +22,11 @@ export default function Home() {
         >
           <TypeAnimation
             key={theme} // Add key prop here
-            sequence={["Welcome to MyApp", 1000]}
+            sequence={["Welcome to TradingBlind", 1000]}
             wrapper="span"
             speed={50}
             className={`font-bold text-5xl sm:text-6xl ${
-              theme === "dark" ? "text-gray-200" : "text-gray-600"
+              theme === "dark" ? "text-gray-200" : "text-black"
             }`}
             style={{ display: "inline-block" }}
             cursor={true}
@@ -54,9 +54,14 @@ export default function Home() {
         transition={{ delay: 0.4, duration: 0.7 }}
       >
         <h2
-          className={`text-4xl font-semibold mb-10 ${
-            theme === "dark" ? "text-gray-500" : "text-[#90cdf4]"
-          }`}
+          className="text-4xl font-semibold mb-10"
+          style={{
+            background: "linear-gradient(to right, #14F195, #00FFA3, #DC1FFF)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundSize: "200% auto",
+            animation: "gradientShift 3s ease infinite",
+          }}
         >
           How does it work?
         </h2>
@@ -99,7 +104,7 @@ export default function Home() {
                 className={`font-semibold ${
                   theme === "dark"
                     ? "bg-green-500 hover:bg-green-400"
-                    : "bg-green-600 hover:bg-green-300"
+                    : "bg-green-600 hover:bg-green-500"
                 } text-white hover:scale-[1.02]`}
               >
                 Start Trading →
