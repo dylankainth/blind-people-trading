@@ -15,7 +15,11 @@ export default function Home() {
         const fetchData = async () => {
             const response = await fetch("http://localhost:8000/price?symbol=SOL-USD&interval=1mo&range=max");
             const result = await response.json();
-            setData(result);
+
+            result.chart.result[0].parsed_quotes.map((item: any) => {
+                item.date = new Date(item.TimestampUTC);
+            })
+            setData(result.chart.result[0].parsed_quotes);
         };
 
         fetchData();
@@ -28,8 +32,8 @@ export default function Home() {
             <div className="flex justify-center w-full">
                 <div className="flex flex-col items-center max-w-[1500px] w-full">
                     <div className="w-full h-[300px] sm:h-[400px] md:h-[500px] mb-12 lg:mb-0 lg:hidden">
-                        {/* <GraphView data={data} /> */}
-                        {JSON.stringify(data)}
+                        <GraphView data={data} />
+
                     </div>
                     <div className="flex flex-col lg:flex-row items-center w-full">
                         <div className="w-full lg:w-1/3 lg:pr-8 mb-6 lg:mb-0">

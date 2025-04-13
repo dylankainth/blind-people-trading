@@ -256,7 +256,7 @@ const GraphView: React.FC = ({ data: initialData }: ZoomableChartProps) => {
                                 <ChartLegend content={<ChartLegendContent />} />
                                 <Area
                                     type="monotone"
-                                    dataKey="events"
+                                    dataKey="Close"
                                     stroke={chartConfig.events.color}
                                     fillOpacity={1}
                                     fill="url(#colorEvents)"
