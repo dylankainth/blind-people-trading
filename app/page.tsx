@@ -9,6 +9,7 @@ export default function Home() {
   const { theme } = useTheme();
 
   return (
+
     <div
       className={`px-4 sm:px-8 md:px-16 lg:px-32 py-12 ${
         theme === "dark" ? "bg-[#0b0f19] text-[#e2e8f0]" : "bg-white"
@@ -154,5 +155,6 @@ export default function Home() {
         </div>
       </motion.div>
     </div>
+
   );
 }

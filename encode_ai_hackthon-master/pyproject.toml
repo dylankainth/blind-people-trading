@@ -1,0 +1,13 @@
+[project]
+name = "encode2"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "ag2[openai]>=0.8.6",
+    "autogen>=0.8.6",
+    "fastapi[standard]>=0.115.12",
+    "nltk>=3.9.1",
+    "python-dotenv>=1.1.0",
+]
