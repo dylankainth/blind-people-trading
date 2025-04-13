@@ -1,5 +1,43 @@
 # Solana Price Direction Predictor
 
+- [Solana Price Direction Predictor](#solana-price-direction-predictor)
+   * [Introduction](#introduction)
+   * [Algorithm Overview](#algorithm-overview)
+   * [Data Preprocessing](#data-preprocessing)
+   * [Model Architecture](#model-architecture)
+   * [Loss Function](#loss-function)
+   * [Ensemble Method](#ensemble-method)
+   * [Training Process](#training-process)
+   * [Prediction](#prediction)
+   * [Mathematical Foundations with Explanations](#mathematical-foundations-with-explanations)
+      + [1. Data Preprocessing](#1-data-preprocessing)
+      + [2. Model Architecture](#2-model-architecture)
+      + [3. Loss Functions](#3-loss-functions)
+      + [4. Ensemble Prediction](#4-ensemble-prediction)
+      + [5. Training Dynamics](#5-training-dynamics)
+   * [Implementation Flow in Raw](#implementation-flow-in-raw)
+   * [Research Paper](#research-paper)
+- [Multi-Agent System for Solana Price Prediction](#multi-agent-system-for-solana-price-prediction)
+   * [Abstract](#abstract)
+   * [1. Introduction](#1-introduction)
+   * [2. Multi-Agent Architecture](#2-multi-agent-architecture)
+      + [2.1 Agent Composition](#21-agent-composition)
+      + [2.2 Communication Flow](#22-communication-flow)
+      + [2.3 Asynchronous Processing](#23-asynchronous-processing)
+   * [3. Function Calling Mechanism](#3-function-calling-mechanism)
+      + [3.1 Function Registration](#31-function-registration)
+      + [3.2 Cross-Agent Function Invocation](#32-cross-agent-function-invocation)
+      + [3.3 Integration with Yahoo Finance API](#33-integration-with-yahoo-finance-api)
+   * [4. Agent Specialization](#4-agent-specialization)
+      + [4.1 DataScientist Agent](#41-datascientist-agent)
+      + [4.2 FinancialAnalyst Agent](#42-financialanalyst-agent)
+      + [4.3 MarketSentimentAnalyst Agent](#43-marketsentimentanalyst-agent)
+   * [5. Decision Synthesis](#5-decision-synthesis)
+   * [6. Conclusion](#6-conclusion)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
+
+
 ## Introduction
 
 This script predicts the direction of the next hour's price movement for Solana (SOL-USD) using a machine learning model that combines CNNs, LSTMs, and attention mechanisms. The model is trained to predict both the value and direction of the price change, with a focus on directional accuracy.
