@@ -44,12 +44,12 @@ const Navbar: React.FC = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            <Link
+            {/* <Link
               href="/docs"
               className={`${navigationMenuTriggerStyle()} text-lg font-medium hover:text-blue-500`}
             >
               Docs
-            </Link>
+            </Link> */}
           </div>
 
           {/* ConnectButton */}
