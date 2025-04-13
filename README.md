@@ -153,6 +153,7 @@ $$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$
 ```math
 \left( \sum_{k=1}^{n} a_k b_k \right)^2 \leq \left( \sum_{k=1}^{n} a_k^{2} \right) \left( \sum_{k=1}^{n} b_k^{2} \right)
 ```
+
 **2.3 Time-Based Attention**  
 *Purpose: Prioritize recent patterns*  
 $$ \text{Weighted Input} = x \cdot \text{softmax}(\text{time\_weights}) $$  
@@ -222,7 +223,9 @@ $$ \text{Pred\_Price} = \exp(\text{Last\_Log\_Close} + \text{Pred\_Diff}) $$
 
 **5.1 Learning Rate Scheduling**  
 *Adaptation Rule*:
-$$ \text{lr}_{\text{new}} = \text{lr}_{\text{old}} \cdot 0.5 \quad \text{if val\_accuracy plateau > 5 epochs} $$  
+```math
+\text{lr}_{\text{new}} = \text{lr}_{\text{old}} \cdot 0.5 \quad \text{if val\_accuracy plateau > 5 epochs}
+```
 - Initial learning rate: 0.0005
 - Factor: 0.5 reduction on plateaus
 - Prevents overshooting in loss landscape
