@@ -21,17 +21,17 @@ export default function Home() {
           transition={{ duration: 0.7 }}
         >
           <TypeAnimation
+            key={theme} // Add key prop here
             sequence={["Welcome to MyApp", 1000]}
             wrapper="span"
             speed={50}
             className={`font-bold text-5xl sm:text-6xl ${
-              theme === "dark" ? "text-white" : "text-gray-800"
+              theme === "dark" ? "text-gray-200" : "text-gray-600"
             }`}
             style={{ display: "inline-block" }}
             cursor={true}
           />
         </motion.div>
-
         <motion.p
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -40,7 +40,10 @@ export default function Home() {
             theme === "dark" ? "text-gray-400" : "text-gray-400"
           }`}
         >
-          This is a website where ... [description]
+          This is a trading platform designed specifically for visually impaired
+          individuals, aiming to transform the complex world of cryptocurrency
+          into an accessible experience. Hear real-time price changes, get
+          AI-powered predictions & news summaries.
         </motion.p>
       </div>
 
@@ -79,11 +82,15 @@ export default function Home() {
                 theme === "dark" ? "text-green-400" : "text-gray-800"
               }`}
             >
-              📈 Auto Monitoring
+              📈 Real-time predictions
             </h3>
-            <p className="text-gray-700 mb-6 dark:text-gray-400">
-              [Description of the auto monitoring feature.] <br />
-              [Have graph to show real-time data and predicted data]
+            <p
+              className={`mb-6 ${
+                theme === "dark" ? "text-gray-400" : "text-gray-700"
+              }`}
+            >
+              Hear Solana's price movements with intuitive audio cues. Get
+              accurate hourly predictions powered by machine learning.
             </p>
             <Link href="/trade">
               <Button
@@ -95,7 +102,7 @@ export default function Home() {
                     : "bg-green-600 hover:bg-green-300"
                 } text-white hover:scale-[1.02]`}
               >
-                Start Monitoring →
+                Start Trading →
               </Button>
             </Link>
           </div>
@@ -115,14 +122,15 @@ export default function Home() {
                 theme === "dark" ? "text-blue-300" : "text-gray-900"
               }`}
             >
-              📰 News
+              📰 AI summarised-news and insights
             </h3>
             <p
               className={`mb-6 ${
                 theme === "dark" ? "text-gray-400" : "text-gray-700"
               }`}
             >
-              [Description of the news feature.]
+              Stay informed with AI-summarized cryptocurrency news. Receive
+              intelligent trading suggestions based on market analysis.
             </p>
             <Link href="/news">
               <Button
@@ -134,7 +142,7 @@ export default function Home() {
                     : "bg-blue-600 hover:bg-blue-500"
                 } text-white hover:scale-[1.02]`}
               >
-                Read News →
+                Read News and Insights →
               </Button>
             </Link>
           </div>
