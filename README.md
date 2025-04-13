@@ -242,23 +242,170 @@ L = 0.6 \cdot \text{HuberLoss} + 0.4 \cdot \text{DirectionLoss}
 
 Included in Solana_Price_Prediction_Model Research_Paper.pdf
 
-Unable to render rich display
-
-No diagram type detected matching given configuration for text: A[Raw Price Data] --> B[Log Transform]
-B --> C{Stationary?}
-C -->|Yes| D[Feature Engineering]
-C -->|No| E[Differencing]
-E --> D
-D --> F[Technical Indicators]
-F --> G[CNN Feature Extraction]
-G --> H[LSTM Temporal Modeling]
-H --> I[Self-Attention Context]
-I --> J[Time-Weighted Attention]
-J --> K[Value Head]
-J --> L[Direction Head]
-K & L --> M[Ensemble Averaging]
-M --> N[Price Reconstruction]
-N --> O[Direction Decision]
-
-
 For more information, see https://docs.github.com/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+
+# Multi-Agent System for Solana Price Prediction
+
+## Abstract
+
+This paper introduces the multi-agent architecture implemented in the Solana Price Direction Predictor system. The framework leverages AutoGen's collaborative agent design to enhance prediction capabilities through specialized agents with distinct roles. We detail the agent communication patterns, function calling mechanisms, and integration with the CNN-LSTM prediction model.
+
+## 1. Introduction
+
+Modern financial prediction systems benefit from collaborative intelligence where specialized components work in concert. Our system implements a multi-agent design pattern where autonomous agents with distinct capabilities collaborate to improve prediction accuracy for Solana price movements.
+
+## 2. Multi-Agent Architecture
+
+### 2.1 Agent Composition
+
+The system employs a group chat structure with the following agents:
+
+- **UserProxy**: Represents the end-user, initiates requests and presents final results
+- **FinancialAnalyst**: Interprets market conditions and technical indicators
+- **DataScientist**: Processes raw data and executes model predictions
+- **MarketSentimentAnalyst**: Analyzes news and social media signals
+- **Coordinator**: Orchestrates workflow and synthesizes insights from other agents
+
+### 2.2 Communication Flow
+
+```mermaid
+graph TD
+    A[UserProxy] -->|Request Prediction| B[Coordinator]
+    B -->|Request Data| C[DataScientist]
+    B -->|Request Analysis| D[FinancialAnalyst]
+    B -->|Request Sentiment| E[MarketSentimentAnalyst]
+    C -->|Data & Predictions| B
+    D -->|Technical Analysis| B
+    E -->|Sentiment Score| B
+    B -->|Synthesized Prediction| A
+```
+
+### 2.3 Asynchronous Processing
+
+The system runs agent collaboration asynchronously using Python's asyncio:
+
+```python
+# Initialization in FastAPI route
+asyncio.create_task(run_chat_async())
+```
+
+This allows the API to remain responsive while the intensive multi-agent discussion occurs in the background.
+
+## 3. Function Calling Mechanism
+
+### 3.1 Function Registration
+
+Each agent exposes callable functions using a standardized schema:
+
+```python
+functions = [
+    {
+        "name": "fetch_price_data",
+        "description": "Fetch historical price data for a given symbol",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "symbol": {"type": "string", "description": "Stock symbol (e.g., SOL-USD)"},
+                "interval": {"type": "string", "description": "Data interval (e.g., 1h)"},
+                "range": {"type": "string", "description": "Predefined date range"}
+            },
+            "required": ["symbol"]
+        }
+    },
+    # Additional functions...
+]
+```
+
+### 3.2 Cross-Agent Function Invocation
+
+Agents can request services from each other using function calls:
+
+```python
+async def run_prediction(symbol, interval="1h", range="5d"):
+    # Collect data
+    price_data = await fetch_price_data(symbol, interval, range)
+    
+    # Generate features
+    features = await calculate_technical_indicators(price_data)
+    
+    # Make prediction
+    prediction = await predict_price_direction(features)
+    
+    return prediction
+```
+
+### 3.3 Integration with Yahoo Finance API
+
+The system leverages FastAPI endpoints to retrieve real-time and historical data:
+
+```python
+async def fetch_price_data(symbol, interval, range):
+    api_url = f"/price?symbol={symbol}&interval={interval}&range={range}"
+    response = await httpx.AsyncClient().get(api_url)
+    return response.json()
+```
+
+## 4. Agent Specialization
+
+### 4.1 DataScientist Agent
+
+- Retrieves historical price data via API calls
+- Executes preprocessing pipeline (log transformation, differencing, scaling)
+- Runs the CNN-LSTM-Attention model prediction
+- Returns both quantitative predictions and confidence scores
+
+### 4.2 FinancialAnalyst Agent
+
+- Interprets technical indicators (RSI, MACD, etc.)
+- Identifies support/resistance levels
+- Evaluates trading volume patterns
+- Provides price target ranges based on technical analysis
+
+### 4.3 MarketSentimentAnalyst Agent
+
+- Analyzes news articles and social media sentiment
+- Quantifies market sentiment as numerical scores
+- Identifies emerging narratives affecting Solana
+- Evaluates correlation between sentiment and price action
+
+## 5. Decision Synthesis
+
+The Coordinator agent employs a weighted decision framework:
+
+```python
+def synthesize_prediction(model_pred, technical_analysis, sentiment_score):
+    # Base weights
+    w_model = 0.6
+    w_technical = 0.3
+    w_sentiment = 0.1
+    
+    # Adjust based on model confidence
+    if model_pred['confidence'] < 0.6:
+        w_model = 0.4
+        w_technical = 0.4
+        w_sentiment = 0.2
+    
+    # Calculate direction probability
+    up_probability = (
+        w_model * model_pred['up_prob'] +
+        w_technical * technical_analysis['bullish_score'] +
+        w_sentiment * sentiment_score['positive_ratio']
+    )
+    
+    return {
+        "direction": "UP" if up_probability > 0.5 else "DOWN",
+        "confidence": abs(up_probability - 0.5) * 2,
+        "price_target": model_pred['price']
+    }
+```
+
+## 6. Conclusion
+
+The multi-agent architecture provides several advantages over monolithic prediction systems:
+
+1. **Specialization**: Each agent focuses on specific aspects of the prediction problem
+2. **Robustness**: Failure in one component doesn't disable the entire system
+3. **Explainability**: A decision process is transparent through agent conversations
+4. **Adaptability**: New agents can be integrated without redesigning the system
+
+This collaborative intelligence approach enhances the Solana price prediction system by combining machine learning forecasts with technical analysis and market sentiment.
