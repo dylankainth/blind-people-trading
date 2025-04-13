@@ -75,9 +75,7 @@ The `SolanaPredictor` model includes:
 - **CNN**: Extracts features from the input sequence.
 - **LSTM Heads**: Separate LSTMs for value and direction predictions.
 - **Self-Attention**: Weighs time steps using:
-  \[
-  \text{attn\_weights} = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right)
-  \]
+$$ \text{attn\_weights} = \text{softmax}\left(\frac{Q K^T}{\sqrt{d_k}}\right) $$
 - **Time-based Attention**: Uses positional encoding to emphasize recent data.
 
 ## Loss Function
@@ -88,9 +86,7 @@ The `DirectionalLoss` combines:
 - **Direction Loss**: Penalizes incorrect direction predictions with class weights.
 
 Total loss:
-\[
-\text{loss} = w_v \cdot \text{HuberLoss}(pred, target) + w_d \cdot \text{direction\_loss}
-\]
+$$ \text{loss} = w_v \cdot \text{HuberLoss}(\text{pred}, \text{target}) + w_d \cdot \text{direction\_loss} $$
 
 ## Ensemble Method
 
@@ -105,4 +101,3 @@ An ensemble of three models is used to enhance prediction stability and accuracy
 ## Prediction
 
 The ensemble model predicts the next hour's price, and the direction is determined by comparing it to the current price.
-
