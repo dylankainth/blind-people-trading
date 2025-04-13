@@ -101,3 +101,170 @@ An ensemble of three models is used to enhance prediction stability and accuracy
 ## Prediction
 
 The ensemble model predicts the next hour's price, and the direction is determined by comparing it to the current price.
+
+## Mathematical Foundations with Explanations
+
+### 1. Data Preprocessing
+
+**1.1 Log Transformation**  
+*Purpose: Stabilize variance in price series*  
+$$ \text{Log\_Close} = \ln(\text{Close}) $$  
+Applies natural logarithm to closing prices to:
+- Reduce sensitivity to extreme values
+- Convert multiplicative relationships to additive
+- Prepare for possible differencing
+
+**1.2 Differencing**  
+*Purpose: Achieve stationarity*  
+$$ \text{Close}_t = \text{Log\_Close}_t - \text{Log\_Close}_{t-1} $$  
+If Augmented Dickey-Fuller test shows non-stationarity (p-value > 0.05), this transformation:
+- Removes trend components
+- Makes statistical properties constant over time
+- Required for ARIMA-style modeling
+
+**1.3 Technical Indicators (RSI Example)**  
+*Purpose: Capture momentum*  
+$$ \text{RSI} = 100 - \frac{100}{1 + \frac{\text{Avg Gain}_{14}}{\text{Avg Loss}_{14}}} $$  
+- Computes relative strength over 14-period window
+- Values > 70 indicate overbought, < 30 oversold
+- Avg Gain/Loss are exponential moving averages
+
+**1.4 Price Momentum**  
+*Purpose: Identify trend direction*  
+$$ \text{Price\_Momentum}_n = \text{Close}_t - \text{Close}_{t-n} $$  
+- Calculates n-period price change (typically n=4 for 4-hour momentum)
+- Positive values indicate upward trend
+- Helps model recognize acceleration/deceleration
+
+---
+
+### 2. Model Architecture
+
+**2.1 LSTM Hidden State Update**  
+*Purpose: Maintain temporal memory*  
+$$ h_t = \text{LSTM}(x_t, h_{t-1}, c_{t-1}) $$  
+- $h_t \in \mathbb{R}^d$: Hidden state vector at time $$t$$
+- $c_t \in \mathbb{R}^d$: Cell state vector carrying long-term information  
+- $d$: Hidden dimension size
+- Update gate controls information retention:
+
+**2.2 Self-Attention Mechanism**  
+*Purpose: Focus on relevant time steps*  
+$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$  
+- $Q$: Query matrix (current focus)
+- $K$: Key matrix (memory keys)
+- $V$: Value matrix (actual content)
+- $\sqrt{d_k}$: Scaling factor preventing gradient vanishing
+
+**2.3 Time-Based Attention**  
+*Purpose: Prioritize recent patterns*  
+$$ \text{Weighted Input} = x \cdot \text{softmax}(\text{time\_weights}) $$  
+- Learnable time weights ($$time\_weights$$) adaptively emphasize recent data
+- Combined with positional encoding for temporal context
+
+**2.4 Value Adjustment**  
+*Purpose: Couple price/direction predictions*  
+$$ \text{Value\_Adjusted} = \text{Value\_Pred} \cdot \left(0.8 + 0.2 \cdot \tanh(\text{Dir\_Logit})\right) $$  
+- $\tanh$ bounds adjustment between [-0.2, +0.2]
+- 0.8 base weight maintains stability
+- Direction logit ($Dir\_Logit$) from classification head
+
+---
+
+### 3. Loss Functions
+
+**3.1 Directional Loss**  
+*Purpose: Joint optimization*  
+$$ L = 0.6 \cdot \text{HuberLoss} + 0.4 \cdot \text{DirectionLoss} $$  
+- 60% weight on value accuracy ($$w_v=0.6$$)
+- 40% weight on direction correctness ($$w_d=0.4$$)
+- Balances regression and classification objectives
+
+**3.2 Huber Loss**  
+*Purpose: Robust regression*  
+$$
+\text{HuberLoss} = 
+\begin{cases} 
+\frac{1}{2}(\hat{y} - y)^2 & \text{if } |\hat{y} - y| \leq \delta \\
+\delta|\hat{y} - y| - \frac{1}{2}\delta^2 & \text{otherwise}
+\end{cases}
+$$
+  
+- $\delta=1.0$: Threshold for linear/quadratic behavior
+- Less sensitive to outliers than MSE
+- Smooth transition at threshold
+
+**3.3 Direction Loss**  
+*Purpose: Handle class imbalance*  
+$$ \text{DirectionLoss} = \frac{\sum w_i \cdot \mathbf{1}(\text{sign}(\hat{y}_i) \neq \text{sign}(y_i))}{\sum \mathbf{1}(|y_i| > \epsilon)} $$  
+- $w_i$: Instance weight (higher for large price moves)
+- $\epsilon=0.005$: Filter for significant movements
+- Focuses model on meaningful directional changes
+
+---
+
+### 4. Ensemble Prediction
+
+**4.1 Model Combination**  
+*Purpose: Improve stability*  
+$$ \hat{y}_{\text{ensemble}} = \frac{1}{3}\sum_{i=1}^3 \hat{y}_i $$  
+- Simple average of 3 independently trained models
+- Reduces variance through diversification
+- Each model uses different random initialization
+
+**4.2 Price Reconstruction**  
+*Purpose: Convert predictions to USD*  
+$$ \text{Pred\_Price} = \exp(\text{Last\_Log\_Close} + \text{Pred\_Diff}) $$  
+1. If differenced: Reconstruct log price by adding prediction to last observed value
+2. Exponentiate to reverse log transformation
+3. Convert stationary value back to USD price
+
+---
+
+### 5. Training Dynamics
+
+**5.1 Learning Rate Scheduling**  
+*Adaptation Rule*:
+$$ \text{lr}_{\text{new}} = \text{lr}_{\text{old}} \cdot 0.5 \quad \text{if val\_accuracy plateau > 5 epochs} $$  
+- Initial learning rate: 0.0005
+- Factor: 0.5 reduction on plateaus
+- Prevents overshooting in loss landscape
+
+**5.2 Directional Prediction**  
+*Decision Rule*:
+$$
+\text{Direction} = 
+\begin{cases}
+\text{"UP"} & \text{if } \hat{y}_{\text{ensemble}} > \text{Current\_Price} \\
+\text{"DOWN"} & \text{otherwise}
+\end{cases}
+$$
+  
+- Compares prediction to most recent observed price
+- Threshold-free decision for operational simplicity
+- Final output combines price + direction
+
+---
+
+## Implementation Flow in Raw
+```mermaid
+A[Raw Price Data] --> B[Log Transform]
+B --> C{Stationary?}
+C -->|Yes| D[Feature Engineering]
+C -->|No| E[Differencing]
+E --> D
+D --> F[Technical Indicators]
+F --> G[CNN Feature Extraction]
+G --> H[LSTM Temporal Modeling]
+H --> I[Self-Attention Context]
+I --> J[Time-Weighted Attention]
+J --> K[Value Head]
+J --> L[Direction Head]
+K & L --> M[Ensemble Averaging]
+M --> N[Price Reconstruction]
+N --> O[Direction Decision]
+```
+
+## Research Paper
+
+Included in Solana_Price_Prediction_Model Research_Paper.pdf
