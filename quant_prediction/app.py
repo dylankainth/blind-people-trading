@@ -2,6 +2,7 @@ import datetime
 import httpx
 from fastapi import FastAPI, Query, HTTPException
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 
 # --- Configuration ---
@@ -189,6 +190,13 @@ config_list_openai = [
 app = FastAPI()
 # Queue to send messages from Autogen to WebSocket
 message_queue = asyncio.Queue()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (adjust as needed)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # --- Autogen Message Interception Callback (WITH DEBUG PRINT) ---
